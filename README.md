@@ -9,6 +9,10 @@ Data for this project was acquired from the [Open Source Imaging Pulmonary Fibro
 
 In the dataset, competitors were  provided with a baseline chest CT scan and associated clinical information for a set of patients. For the purposes of this project, we were interested in identifying if patients did or did not have Pulmonary Fibrosis based on the baseline CT Scan taken. Thus, a new set of labels was created, which marked all the paitents as having pulmonary fibrosis, which was true of the original dataset. 
 
+labels.csv
+0 -> No pulmonary fibrosis 
+1 -> pulmonary fibrosis 
+
 ## Data Usage Disclosure
 
 Anyone may access and use the Competition Data for any purpose, whether commercial or non-commercial, including for participating in the Competition and on Kaggle.com forums, and for academic research and education. 
