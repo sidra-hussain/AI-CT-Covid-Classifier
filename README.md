@@ -1,4 +1,4 @@
-# AI-CT-Covid-Classifier
+# AI-CT-PF-Classifier
 This is an ML model that predicts if a patient has Pulmonary Fibrosis or not based on their CT Scans of their Lungs using the SE ResNet50 3D model. 
 
 ## Description 
