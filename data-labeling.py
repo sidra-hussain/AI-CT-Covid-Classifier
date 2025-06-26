@@ -11,13 +11,13 @@ def list_folders_to_csv(root_dir, output_csv):
     # Filter only directories (ignore files like labels.csv)
     folders = [
         entry for entry in entries
-        if os.path.isdir(os.path.join(root_dir, entry)) and entry != output_csv_name
+        if os.path.isdir(os.path.join(root_dir, entry)) and entry != output_csv
     ]
 
     # Write to CSV
     with open(output_csv, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['paitent_id', 'label'])  # Header
+        writer.writerow(['paitent_id', 'label'])  # Headers
         for folder in folders:
             writer.writerow([folder, 1])
 
