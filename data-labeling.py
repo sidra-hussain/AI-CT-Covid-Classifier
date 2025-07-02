@@ -17,7 +17,7 @@ def list_folders_to_csv(root_dir, output_csv):
     # Write to CSV
     with open(output_csv, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['paitent_id', 'label'])  # Headers
+        writer.writerow(['patient_id', 'label'])  # Headers
         for folder in folders:
             writer.writerow([folder, 1])
 
