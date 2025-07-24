@@ -1,29 +1,46 @@
-#This script acquires all the paitent_ids from the dataset folder and labels them as 1 (Pulmonary Fibrosis)
+import pandas as pd
 
-import os
-import csv
+# Load the dataset
+df = pd.read_csv('dataset/train.csv')
 
-def list_folders_to_csv(root_dir, output_csv):
-    
-    # Get list of all entries in the directory
-    entries = os.listdir(root_dir)
-    
-    # Filter only directories (ignore files like labels.csv)
-    folders = [
-        entry for entry in entries
-        if os.path.isdir(os.path.join(root_dir, entry)) and entry != output_csv
-    ]
+# Step 1: For each patient, find the row where `Weeks` is closest to 0
+df['Weeks_abs'] = df['Weeks'].abs()
+closest_weeks_df = df.loc[df.groupby('Patient')['Weeks_abs'].idxmin()]
 
-    # Write to CSV
-    with open(output_csv, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['patient_id', 'label'])  # Headers
-        for folder in folders:
-            writer.writerow([folder, 1])
+# Step 2: Assign a label based on `Percent` value
+#labeling function for multiclass labels
+def percent_to_label_multiclass(p):
+    if p >= 80: #normal
+        return 0
+    elif 60 <= p < 80: #mild
+        return 1
+    elif 50 <= p < 60: #moderate
+        return 2
+    else:
+        return 3 #severe
 
-    print(f"Saved {len(folders)} folder names with labels to '{output_csv}'")
+#labeling function for binary class labels
+def percent_to_label_binaryclass(p):
+    if p >= 80: #normal
+        return 0
+    elif p < 80: #not normal
+        return 1
 
-# Example usage:
-root_directory = 'dataset'
-output_csv_path = 'dataset/labels.csv'
-list_folders_to_csv(root_directory, output_csv_path)
+#multi class labeling
+# closest_weeks_df['label'] = closest_weeks_df['Percent'].apply(percent_to_label_multiclass)
+
+#binary labeling
+closest_weeks_df['label'] = closest_weeks_df['Percent'].apply(percent_to_label_binaryclass)
+
+# Step 3: Select and rename columns
+output_df = closest_weeks_df[['Patient', 'label', 'Weeks', 'FVC', 'Percent']].rename(columns={'Patient': 'patient_id'})
+
+# Step 4: Split into three categories
+between_8 = output_df[(output_df['Weeks'] >= -8) & (output_df['Weeks'] <= 8)]
+between_12 = output_df[(output_df['Weeks'] >= -12) & (output_df['Weeks'] <= 12)]
+outside_12 = output_df[(output_df['Weeks'] < -12) | (output_df['Weeks'] > 12)]
+
+# Step 5: Save each to separate CSVs
+between_8.to_csv('dataset/labels_8_weeks.csv', index=False)
+between_12.to_csv('dataset/labels_12_weeks.csv', index=False)
+outside_12.to_csv('dataset/labels_invalid_fvc.csv', index=False)
