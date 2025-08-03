@@ -26,21 +26,22 @@ def percent_to_label_binaryclass(p):
     elif p < 80: #not normal
         return 1
 
-#multi class labeling
-# closest_weeks_df['label'] = closest_weeks_df['Percent'].apply(percent_to_label_multiclass)
-
-#binary labeling
-closest_weeks_df['label'] = closest_weeks_df['Percent'].apply(percent_to_label_binaryclass)
-
 # Step 3: Select and rename columns
-output_df = closest_weeks_df[['Patient', 'label', 'Weeks', 'FVC', 'Percent']].rename(columns={'Patient': 'patient_id'})
+output_df = closest_weeks_df[['Patient', 'Weeks', 'FVC', 'Percent']].rename(columns={'Patient': 'patient_id'})
 
-# Step 4: Split into three categories
-between_8 = output_df[(output_df['Weeks'] >= -8) & (output_df['Weeks'] <= 8)]
-between_12 = output_df[(output_df['Weeks'] >= -12) & (output_df['Weeks'] <= 12)]
+# Step 4: Split into two categories, valid and invalid CTs
+between_12 = output_df[(output_df['Weeks'] >= -12) & (output_df['Weeks'] <= 12)].copy()
 outside_12 = output_df[(output_df['Weeks'] < -12) | (output_df['Weeks'] > 12)]
 
 # Step 5: Save each to separate CSVs
-between_8.to_csv('dataset/labels_8_weeks.csv', index=False)
-between_12.to_csv('dataset/labels_12_weeks.csv', index=False)
-outside_12.to_csv('dataset/labels_invalid_fvc.csv', index=False)
+
+#binary labeling
+between_12['label'] = between_12['Percent'].apply(percent_to_label_binaryclass)
+between_12.to_csv('dataset/labels_binary.csv', index=False)
+
+#multiclass labeling
+between_12['label'] = between_12['Percent'].apply(percent_to_label_multiclass)
+between_12.to_csv('dataset/labels_multi.csv', index=False)
+
+#store the CT scans that are invalid in a seperate CSV
+outside_12.to_csv('dataset/labels_invalid.csv', index=False)
